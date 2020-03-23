@@ -39,7 +39,7 @@ module Cashfree
 	  	uri = "/payout/v1/authorize"
 	  	url = @domain+uri
 	  	begin 
-	  		response = RestClient.get url , {"X-Client-Id" => @client_id, "X-Client-Secret"=>@client_secret}
+	  		response = RestClient.post url ,'', {"X-Client-Id" => @client_id, "X-Client-Secret"=>@client_secret}
 	  	rescue 
 	  		rescue Cashfree::Error::CONECTION_ERROR
 	  	else
