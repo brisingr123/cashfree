@@ -2,7 +2,10 @@ require "cashfree/version"
 require 'rest-client'
 require 'json'
 module Cashfree
-  class Error < StandardError; end
+  class Error < StandardError; 
+  	CONFIG_ERROR = "Token is not valid"
+  	CONECTION_ERROR = "Couldn't connect to cashfree server"
+  end
   
   class Payment
 	  def initialize domain: , client_id:, client_secret: 
@@ -21,12 +24,12 @@ module Cashfree
 	  		begin 
 				response = RestClient.get url , {"Authorization" => "Bearer #{token}"}	  		
 			rescue RestClient::CashfreeError => err
-				return "Couldn't connect to cashfree"
+				rescue Cashfree::Error::CONECTION_ERROR
 			else
 				return JSON.parse(response.body)
 			end
 	  	else
-	  		puts "Configuration mismatch"
+	  		raise Cashfree::Error::CONFIG_ERROR
 	  	end
 	  end
 
@@ -37,8 +40,8 @@ module Cashfree
 	  	url = @domain+uri
 	  	begin 
 	  		response = RestClient.get url , {"X-Client-Id" => @client_id, "X-Client-Secret"=>@client_secret}
-	  	rescue RestClient::CashfreeError => err
-	  		return "Couldn't connect to cashfree"
+	  	rescue 
+	  		rescue Cashfree::Error::CONECTION_ERROR
 	  	else
 	  		return JSON.parse(response.body)
 	  	end
