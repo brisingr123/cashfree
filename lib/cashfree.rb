@@ -15,15 +15,14 @@ module Cashfree
 
 	  def validate_bank name: , phone: ,bankAccount: , ifsc: 
 	  	authentication = authenticate
-	  	if authentication["status"] =="SUCCESS"
-	  		token = authentication["token"]
-
+	  	if authentication["subCode"] =="200"
+	  		token = authentication["data"]["token"]
 	  		uri = '/payout/v1/validation/bankDetails'
 	  		url = @domain+uri
 
-	  		begin 
-				response = RestClient.get url , {"Authorization" => "Bearer #{token}"}	  		
-			rescue RestClient::CashfreeError => err
+			begin
+				response = RestClient.get "#{@domain}#{uri}?#{URI.encode_www_form({name: name , phone: phone, bankAccount: bankAccount, ifsc: ifsc})}", {"Authorization" => "Bearer #{token}"}
+			rescue  => e
 				rescue Cashfree::Error::CONECTION_ERROR
 			else
 				return JSON.parse(response.body)
